@@ -1,14 +1,28 @@
+# 华为心声社区的第一页帖子名称
 import urllib.request
 from bs4 import BeautifulSoup
 
-url = "http://www.baidu.com"
-proxy_support = urllib.request.ProxyHandler({'http': 'proxy.huawei.com:8080'})
-opener = urllib.request.build_opener(proxy_support)
-r = opener.open(url)
-urllib.request.install_opener(opener)
+i = 1
+for pageIndex in range(1, 10, 1) :
+    # 通过urllib获取页面数据
+    url = "http://xinsheng.huawei.com/cn/index.php?app=forum&mod=List&act=index&class=461&p=" + str(pageIndex)
+    page = urllib.request.urlopen(url)
+    html = page.read()
+    # 创建beautifulsoup对象，用来解析页面数据
+    soup = BeautifulSoup(html, "html.parser")
+    soup.prettify()
+    # 根据页面结构，具体解析过程
+    bbsDiv = soup.find(attrs={"class": "bbs_list"})
+    bbsDiv.stripped_strings
+    bbsBlock = bbsDiv.contents[3]  # 空白行也被当做节点 ，每个节点前有个"\n" ，因此，取第二个儿子需要用[4]
 
-print(r.read())
-page = urllib.request.urlopen(url)
-html = page.read()
-soup = BeautifulSoup(html,"html.parser")
-print (soup)
+    # 具体解析
+    bbsUL = bbsBlock.children
+
+    for child in bbsUL:
+        if child.name == "li":
+            className = child.get('class')
+            if className is not None:
+                continue
+            print("%d:%s" % (i, child.a.string))
+            i += 1
